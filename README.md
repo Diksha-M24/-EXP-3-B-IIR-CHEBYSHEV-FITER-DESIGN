@@ -1,112 +1,75 @@
-# EXP 1 : Linear and Circular Convolution
+# EXP 3 : IIR-CHEBYSHEV-FITER-DESIGN
 
 ## AIM: 
 
- To perform Linear and Circular Convolution for two given sequence using SCILAB. 
+ To design an IIR Chebyshev filter  using SCILAB. 
 
 ## APPARATUS REQUIRED: 
 PC installed with SCILAB. 
 
-## PROGRAM (Linear Convolution): 
+## PROGRAM (LPF): 
 ```
-// Linear Convolution
-
-
-x = input("Enter x(n) as a vector, e.g., [1 2 1 2]: ");
-h = input("Enter h(n) as a vector, e.g., [1 1]: ");
-
-Nx = length(x);
-Nh = length(h);
-Ny = Nx + Nh - 1;
-
-x_p = [x, zeros(1, Ny - Nx)];
-h_p = [h, zeros(1, Ny - Nh)];
-
-y = zeros(1, Ny);
-for n = 0:Ny-1
-    for k = 0:Nx-1
-        if (n-k >= 0 & n-k < Nh) then
-            y(n+1) = y(n+1) + x_p(k+1) * h_p(n-k+1);
-        end
-    end
-end
-
-disp("y(n) = "), disp(y);
-
-clf;
-
-subplot(3,1,1);
-n1 = 0:Nx-1;
-plot2d3(n1, x);   
-xtitle("x(n)");
-
-subplot(3,1,2);
-n2 = 0:Nh-1;
-plot2d3(n2, h);
-xtitle("h(n)");
-
-subplot(3,1,3);
-n3 = 0:Ny-1;
-plot2d3(n3, y);
-xtitle("y(n) = x(n) * h(n)");
-```
-## PROGRAM (Circular Convolution): 
-```
-// Circular Convolution
-
-
-clc;
 clear;
+Fs = 5000;         
+fc = 1500;         
+
+b = [0.0929 0.2787 0.2787 0.0929];   
+a = [1.0000 -0.5772 0.4218 -0.0561];  
+
+Npoints = 512;
+[H, f_norm] = frmag(b, a, Npoints);
+
+f = f_norm * Fs;
+
+clf();
+plot(f, 20*log10(H + %eps));
+xlabel("Frequency (Hz)");
+ylabel("Magnitude (dB)");
+title("Chebyshev Type I Low Pass Filter (Order 3)");
+xgrid();
+
+disp(b, "Numerator coefficients (b):");
+disp(a, "Denominator coefficients (a):");
 
 
-function [y] = pmod(a, n)
-    y = modulo(a, n);
-endfunction
-
-
-disp("Enter first sequence x: ");
-x = input("");
-
-disp("Enter second sequence h: ");
-h = input("");
-
-N = max(length(x), length(h));
-
-
-x = [x, zeros(1, N-length(x))];
-h = [h, zeros(1, N-length(h))];
-
-y_lin = conv(x, h);
-
-y_circ = zeros(1, N);
-for k = 1:length(y_lin)
-    idx = pmod(k-1, N) + 1;
-    y_circ(idx) = y_circ(idx) + y_lin(k);
-end
-
-disp("Circular Convolution using conv():");
-disp(y_circ);
-
-subplot(3,1,1);
-plot2d3(0:N-1, x);
-xtitle("Input Sequence x[n]");
-
-subplot(3,1,2);
-plot2d3(0:N-1, h);
-xtitle("Input Sequence h[n]");
-
-subplot(3,1,3);
-plot2d3(0:N-1, y_circ);
-xtitle("Circular Convolution y[n]");
 ```
-## OUTPUT (Linear Convolution): 
-<img width="914" height="714" alt="image" src="https://github.com/user-attachments/assets/917549db-5e2d-4c18-913c-2112b23f26c0" />
+## PROGRAM (HPF): 
+```
+clear;
+Fs = 5000;          
+
+fc = 1500;          
+
+b = [0.4218 -0.5772 0.2787 -0.0929];   
+a = [1.0000 -0.5772 0.4218 -0.0561];  
+
+Npoints = 512;
+[H, f_norm] = frmag(b, a, Npoints);
+
+f = f_norm * Fs;
+
+clf();
+plot(f, 20*log10(H + %eps));
+xlabel("Frequency (Hz)");
+ylabel("Magnitude (dB)");
+title("Chebyshev Type I High Pass Filter (Order 3)");
+xgrid();
+
+disp(b, "Numerator coefficients (b):");
+disp(a, "Denominator coefficients (a):");
+```
 
 
-## OUTPUT (Circular Convolution): 
-<img width="888" height="709" alt="image" src="https://github.com/user-attachments/assets/2f64439b-d024-4be8-82fa-2c31237d81a1" />
-
-## RESULT: 
-Thus, the linear convolution and circular convolution of the two given sequences were performed and its result was verified.
+## OUTPUT (LPF) : 
+<img width="1911" height="1199" alt="image" src="https://github.com/user-attachments/assets/d5e2d6d7-3903-4626-9fd5-72f602171e76" />
 
 
+
+
+## OUTPUT (HPF) : 
+<img width="1919" height="1197" alt="image" src="https://github.com/user-attachments/assets/55964f30-1d40-4df8-bbf8-e86a70e88b0f" />
+
+
+## RESULT:
+
+  A 3rd-order Chebyshev Type I high-pass filter was designed with cutoff frequency 1500 Hz and sampling frequency 5000 Hz. The frequency response shows ripple in the passband and sharp attenuation in the stopband.
